@@ -2,6 +2,8 @@
 #include <QApplication>
 #include <QDebug>
 #include <QWidget>
+#include <QListView>
+#include <QStringListModel>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -52,11 +54,38 @@ MainWindow::MainWindow(QWidget *parent)
     resize(m_deskRect.width(),m_deskRect.height());
 
     connect(m_tab,&MyTabWidget::tabCloseRequested,m_tab,&MyTabWidget::closeTab);
-    connect(m_tab,&MyTabWidget::tabBarClicked,this,[=](){
-        qDebug() << m_tab->currentIndex();
-    });
     connect(btn_load,&QPushButton::clicked,this, [=](){
         m_tab->loadWeb(line_address->text());
+    });
+    connect(btn_back,&QPushButton::clicked,this, [=](){
+       m_tab->views().at(m_tab->currentIndex())->back();
+    });
+    connect(btn_forword,&QPushButton::clicked,this, [=](){
+       m_tab->views().at(m_tab->currentIndex())->forward();
+    });
+    connect(btn_reload,&QPushButton::clicked,this, [=](){
+       m_tab->views().at(m_tab->currentIndex())->reload();
+    });
+    connect(btn_history,&QPushButton::clicked,this, [=](){
+        QWidget *wg_history = new QWidget;
+        QListView *lv_history = new QListView;
+        wg_history->resize(200,500);
+        wg_history->move((m_deskRect.width()-250),50);
+        wg_history->setWindowTitle("History");
+        wg_history->setWindowFlags(Qt::WindowTitleHint);
+        QStringList list_history;
+        m_history = m_tab->views().at(m_tab->currentIndex())->history();
+        for(int i=0;i<m_history->items().count();i++){
+            list_history.append(m_history->items().at(i).url().toString());
+        }
+        QStringListModel *m_model = new QStringListModel(list_history);
+        lv_history->setModel(m_model);
+        lv_history->resize(200,500);
+        lv_history->setParent(wg_history);
+        connect(lv_history,&QListView::clicked,this, [=](){
+            m_tab->views().at(m_tab->currentIndex())->load(QUrl(list_history.at(lv_history->currentIndex().row())));
+        });
+        wg_history->show();
     });
 }
 

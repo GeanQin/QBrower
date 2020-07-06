@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QApplication>
 #include <QHBoxLayout>
+#include <QTabBar>
 
 void MyTabWidget::mouseDoubleClickEvent(QMouseEvent* e){
     this->newTab();
@@ -22,12 +23,15 @@ void MyTabWidget::closeTab(int index){
 void MyTabWidget::newTab(){
     MyWebView *new_view = new MyWebView;
     new_view->getTabWidget(this);
+    connect(new_view,&MyWebView::titleChanged,new_view,[=](){
+        this->setTabText(this->currentIndex(),new_view->title());
+    });
     m_views.append(new_view);
     this->addTab(new_view,"No title");
 }
 
 void MyTabWidget::loadWeb(QString url){
-    m_views.at(this->currentIndex())->load(QUrl(url));
+    m_views.at(this->currentIndex())->page()->setUrl(QUrl(url));
 }
 
 QList<QWebEngineView *> MyTabWidget::views(){

@@ -10,6 +10,7 @@
 #include <QTabWidget>
 #include <QLineEdit>
 #include <QDesktopWidget>
+#include <QWebEngineHistory>
 
 class MainWindow : public QMainWindow
 {
@@ -33,6 +34,7 @@ private:
     QPushButton *btn_history;
     QLineEdit *line_address;
     QLineEdit *line_value;
+    QWebEngineHistory *m_history;
 };
 
 #endif // MAINWINDOW_H
